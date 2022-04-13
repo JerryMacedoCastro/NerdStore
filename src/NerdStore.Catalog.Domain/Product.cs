@@ -24,6 +24,8 @@ namespace NerdStore.Catalog.Domain
             Value = value;
             RegisterDate = registerDate;
             Image = image;
+
+            Validate();
         }
 
         public void Activate() => Active = true;
@@ -52,10 +54,12 @@ namespace NerdStore.Catalog.Domain
             return InventoryQuantity >= quantity;
         }
         public void Validate() 
-        { 
-            
-
-        
+        {
+            AssertionConcern.ValidateEmpty(Name, "O campo nome do produto não pode estar vazio!");
+            AssertionConcern.ValidateEmpty(Description, "O campo descrição do produto não pode estar vazio!");
+            AssertionConcern.ValidateEmpty(Image, "O campo imagem do produto não pode estar vazio");
+            AssertionConcern.ValidateNotEquals(CategoryId, Guid.Empty, "O campo ID da categoria do produto não pode estar vazio!");
+            AssertionConcern.ValidateLessOrEqualThanMin(Value, 0, "O campor valor do produto não pode ser menor ou igual a zero!");
         }
 
     }
