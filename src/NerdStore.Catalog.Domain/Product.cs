@@ -37,23 +37,25 @@ namespace NerdStore.Catalog.Domain
         }
         public void ChangeDescription(string description)
         {
-            Description = description; 
+            AssertionConcern.ValidateEmpty(description, "O campo descrição do produto não pode estar vazio!");
+            Description = description;
         }
 
         public void DecreaseIventory(int quantity)
         {
             if (quantity < 0) quantity *= -1;
+            if (!HasInventory(quantity)) throw new DomainException("Estoque induficiente!");
             InventoryQuantity -= quantity;
         }
         public void IncreaseInventory(int quantity)
         {
             InventoryQuantity += quantity;
-        } 
+        }
         public bool HasInventory(int quantity)
         {
             return InventoryQuantity >= quantity;
         }
-        public void Validate() 
+        public void Validate()
         {
             AssertionConcern.ValidateEmpty(Name, "O campo nome do produto não pode estar vazio!");
             AssertionConcern.ValidateEmpty(Description, "O campo descrição do produto não pode estar vazio!");
@@ -62,16 +64,6 @@ namespace NerdStore.Catalog.Domain
             AssertionConcern.ValidateLessOrEqualThanMin(Value, 0, "O campor valor do produto não pode ser menor ou igual a zero!");
         }
 
-    }
-    public class Category : Entity
-    {
-        public string Name { get; private set; }
-        public string Code { get; private set; }
-
-        public override string ToString()
-        {
-            return $"{Name} - {Code}";
-        }
     }
 
 }
