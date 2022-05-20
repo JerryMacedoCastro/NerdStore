@@ -14,8 +14,9 @@ namespace NerdStore.Catalog.Domain
         public string Image { get; private set; }
         public int InventoryQuantity { get; private set; }
         public Category Category { get; private set; }
+        public Dimensions Dimensions { get; private set; }
 
-        public Product(string name, string description, bool active, decimal value, Guid categoryId, DateTime registerDate, string image)
+        public Product(string name, string description, bool active, decimal value, Guid categoryId, DateTime registerDate, string image, Dimensions dimensions)
         {
             CategoryId = categoryId;
             Name = name;
@@ -24,6 +25,9 @@ namespace NerdStore.Catalog.Domain
             Value = value;
             RegisterDate = registerDate;
             Image = image;
+            Dimensions = dimensions;
+
+            Validate();
         }
 
         public void Activate() => Active = true;
@@ -35,39 +39,33 @@ namespace NerdStore.Catalog.Domain
         }
         public void ChangeDescription(string description)
         {
-            Description = description; 
+            AssertionConcern.ValidateEmpty(description, "O campo descrição do produto não pode estar vazio!");
+            Description = description;
         }
 
         public void DecreaseIventory(int quantity)
         {
             if (quantity < 0) quantity *= -1;
+            if (!HasInventory(quantity)) throw new DomainException("Estoque induficiente!");
             InventoryQuantity -= quantity;
         }
         public void IncreaseInventory(int quantity)
         {
             InventoryQuantity += quantity;
-        } 
+        }
         public bool HasInventory(int quantity)
         {
             return InventoryQuantity >= quantity;
         }
-        public void Validate() 
-        { 
-            
-
-        
-        }
-
-    }
-    public class Category : Entity
-    {
-        public string Name { get; private set; }
-        public string Code { get; private set; }
-
-        public override string ToString()
+        public void Validate()
         {
-            return $"{Name} - {Code}";
+            AssertionConcern.ValidateEmpty(Name, "O campo nome do produto não pode estar vazio!");
+            AssertionConcern.ValidateEmpty(Description, "O campo descrição do produto não pode estar vazio!");
+            AssertionConcern.ValidateEmpty(Image, "O campo imagem do produto não pode estar vazio");
+            AssertionConcern.ValidateNotEquals(CategoryId, Guid.Empty, "O campo ID da categoria do produto não pode estar vazio!");
+            AssertionConcern.ValidateLessOrEqualThanMin(Value, 0, "O campor valor do produto não pode ser menor ou igual a zero!");
         }
+
     }
 
 }
