@@ -119,7 +119,7 @@ namespace NerdStore.Core.DomainObjects
         }
         public static void ValidateLessOrEqualThanMin(decimal value, decimal min, string message)
         {
-            if (value <= min)
+            if (value < min)
             {
                 throw new DomainException(message);
             }
